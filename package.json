@@ -1,0 +1,25 @@
+{
+  "name": "backdoor-backend",
+  "version": "1.0.0",
+  "description": "Backend for our cyper security forum - \"Backdoor\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qubit-epics/backdoor-backend.git"
+  },
+  "keywords": [
+    "backdoor",
+    "cyber",
+    "security",
+    "forum"
+  ],
+  "author": "Backdoor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qubit-epics/backdoor-backend/issues"
+  },
+  "homepage": "https://github.com/qubit-epics/backdoor-backend#readme"
+}
