@@ -79,8 +79,8 @@ export const searchPost = async (req: Request, res: Response) => {
 
     let dbQuery = {};
     if(!searchQuery && !tags) dbQuery = {};
-    else if(!tags) dbQuery = { $and:[ { title } ] };
-    else if(!searchQuery) dbQuery = { $and:[ {tags: {$in: tags.split(",")}} ] };
+    else if(!tags) dbQuery = { title };
+    else if(!searchQuery) dbQuery = { tags: {$in: tags.split(",")} };
     else dbQuery = { $and:[ { title } , {tags: {$in: tags.split(",")}} ] };
 
     await postModel
