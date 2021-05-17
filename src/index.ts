@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import config from "./configs/config";
 
 import postRoutes from "./routes/posts";
+import userRoutes from "./routes/user";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ "extended": true }));
 
 app.use("/posts", postRoutes);
+app.use("/user", userRoutes);
 
 // start database connection and server
 const port = config.server.port;
