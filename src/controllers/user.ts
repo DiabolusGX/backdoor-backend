@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Types } from "mongoose";
 import userModel from "../database/models/userModel";
 
 // create new user and return user data
@@ -30,7 +31,8 @@ export const googleSignup = async (req: Request, res: Response) => {
 export const googleLogin = async (req: Request, res: Response) => {
     const { email } = req.body;
 
-    await userModel.findOne({ email: email })
+    await userModel
+        .findOne({ email: email })
         .then(user => res.status(200).json(user))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
 }
@@ -39,20 +41,23 @@ export const googleLogin = async (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
     const query = req.query;
 
-    await userModel.findOne( query )
+    await userModel
+        .findOne( query )
         .then(user => user 
             ? res.status(200).json(user)
             : res.status(404).json({ message: "no user found" }))
         .catch(err => res.status(404).json({ message: err.message, error: err }));
 }
 
-// update user data using document id and return new user data
+// update user data using user document id and return new user data
 export const updateUser = async (req: Request, res: Response) => {
     const { _id, user } = req.body;
+    if (!Types.ObjectId.isValid(_id)) return res.status(404).json({ message: `No user with id: ${_id}` });
 
-    await userModel.findOneAndUpdate({ _id: _id }, { $set: user }, { new: true })
+    await userModel
+        .findOneAndUpdate({ _id }, { $set: user }, { new: true })
         .then(updtedUser => updtedUser
             ? res.status(200).json(updtedUser)
-            : res.status(409).json({ message: "no updated user found`" }))
+            : res.status(409).json({ message: "no updated user found" }))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
 }
