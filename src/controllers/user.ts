@@ -6,12 +6,12 @@ import userModel from "../database/models/userModel";
 export const googleSignup = async (req: Request, res: Response) => {
     const { username, bio, profile } = req.body;
 
-    // await userModel
-    //     .findOne({ $or:[ {email:profile.email}, {username: username} ] })
-    //     .then(user => user
-    //             ? res.status(409).json({ message: "User already exists with that email or username." })
-    //             : null)
-    //     .catch(err => res.status(409).json({ message: err.message, error: err }));
+    await userModel
+        .findOne({ $or:[ {email:profile.email}, {username: username} ] })
+        .then(user => user
+                ? res.status(409).json({ message: "User already exists with that email or username." })
+                : null)
+        .catch(err => res.status(409).json({ message: err.message, error: err }));
 
     const user = {
         email: profile.email,
