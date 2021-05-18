@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
 import IPost from "../database/interfaces/postInterface";
-import postModel from "../database/models/postModel";
+import Post from "../database/models/postModel";
 
 // get all posts
 export const getPost = async (req: Request, res: Response) => {
-    await postModel
+    await Post
         .find()
         .then(posts => res.status(200).json(posts))
         .catch(err => res.status(404).json({ message: err.message, error: err }));
@@ -15,7 +15,7 @@ export const getPost = async (req: Request, res: Response) => {
 export const createPost = async (req: Request, res: Response) => {
     const post = req.body;
 
-    await new postModel(post)
+    await new Post(post)
         .save()
         .then(newPost => res.status(201).json(newPost))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
@@ -29,7 +29,7 @@ export const likePost = async (req: Request, res: Response) => {
     if (!Types.ObjectId.isValid(userId)) return res.status(404).json({ message: `No user with id: ${userId}` });
 
     let votes:any = [];
-    await postModel
+    await Post
         .findById(postId)
         .then(async post => {
             // @ts-expect-error
@@ -43,7 +43,7 @@ export const likePost = async (req: Request, res: Response) => {
         })
         .catch(err => res.status(409).json({ message: err.message, error: err }));
 
-    await postModel
+    await Post
         .findOneAndUpdate({ _id: postId }, { $set: { votes: votes } }, { new: true })
         .then(updatedPost => res.status(200).json(updatedPost))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
@@ -54,7 +54,7 @@ export const updatePost = async (req: Request, res: Response) => {
     const { _id, post } = req.body;
     if (!Types.ObjectId.isValid(_id)) return res.status(404).json({ message: `No post with id: ${_id}` });
 
-    await postModel
+    await Post
         .findOneAndUpdate({ _id }, { $set: post }, { new: true })
         .then(updatedPost => res.status(200).json(updatedPost))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
@@ -65,7 +65,7 @@ export const deletePost = async (req: Request, res: Response) => {
     const { _id } = req.body;
     if (!Types.ObjectId.isValid(_id)) return res.status(404).json({ message: `No post with id: ${_id}` });
 
-    await postModel
+    await Post
         .findOneAndDelete({ _id: _id })
         .then(deletedPost =>  res.status(200).json(deletedPost))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
@@ -83,7 +83,7 @@ export const searchPost = async (req: Request, res: Response) => {
     else if(!searchQuery) dbQuery = { tags: {$in: tags.split(",")} };
     else dbQuery = { $and:[ { title } , {tags: {$in: tags.split(",")}} ] };
 
-    await postModel
+    await Post
         .find( dbQuery )
         .then(posts => posts
             ? res.status(200).json(posts)

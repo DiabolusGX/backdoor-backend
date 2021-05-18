@@ -1,9 +1,12 @@
 import express from "express";
 
-import { googleSignup, googleLogin, getUser, updateUser } from "../controllers/user";
+import { signup, login, googleSignup, googleLogin, getUser, updateUser } from "../controllers/user";
+import { isLoggedIn } from "../middleware/auth";
 
 const router = express.Router();
 
+router.post("/signup", signup);
+router.post("/login", login);
 router.post("/google/signup", googleSignup);
 router.post("/google/login", googleLogin);
 router.get("/validate", getUser);

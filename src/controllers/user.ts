@@ -1,17 +1,45 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
-import userModel from "../database/models/userModel";
+import User from "../database/models/User";
+import bcrypt from "bcryptjs";
+const passport = require("passport");
+
+import { userExists } from '../middleware/auth';
+
+export const signup = async (req: Request, res: Response) => {
+    const { email, username, password } = req.body;
+    const hash = bcrypt.hashSync(password, 14);
+
+    if (await userExists(username, email)) {
+        return res.status(409).json({ message: "Username or email already taken" });
+    }
+
+    const user = {
+        email,
+        username,
+        password: hash
+    }
+
+    // TODO: Send a different response on success. One that doesn't have the hash.
+    await new User(user)
+        .save()
+        .then(newUser => {
+            res.status(200).json(newUser)
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+export const login = passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/login"
+});
+
 
 // create new user and return user data
 export const googleSignup = async (req: Request, res: Response) => {
     const { username, bio, profile } = req.body;
-
-    await userModel
-        .findOne({ $or:[ {email:profile.email}, {username: username} ] })
-        .then(user => user
-                ? res.status(409).json({ message: "User already exists with that email or username." })
-                : null)
-        .catch(err => res.status(409).json({ message: err.message, error: err }));
 
     const user = {
         email: profile.email,
@@ -21,7 +49,7 @@ export const googleSignup = async (req: Request, res: Response) => {
         picture: profile.picture
     }
 
-    await new userModel(user)
+    await new User(user)
         .save()
         .then(newUser => res.status(201).json(newUser))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
@@ -31,7 +59,7 @@ export const googleSignup = async (req: Request, res: Response) => {
 export const googleLogin = async (req: Request, res: Response) => {
     const { email } = req.body;
 
-    await userModel
+    await User
         .findOne({ email: email })
         .then(user => res.status(200).json(user))
         .catch(err => res.status(409).json({ message: err.message, error: err }));
@@ -41,9 +69,9 @@ export const googleLogin = async (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
     const query = req.query;
 
-    await userModel
-        .findOne( query )
-        .then(user => user 
+    await User
+        .findOne(query)
+        .then(user => user
             ? res.status(200).json(user)
             : res.status(404).json({ message: "no user found" }))
         .catch(err => res.status(404).json({ message: err.message, error: err }));
@@ -54,7 +82,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const { _id, user } = req.body;
     if (!Types.ObjectId.isValid(_id)) return res.status(404).json({ message: `No user with id: ${_id}` });
 
-    await userModel
+    await User
         .findOneAndUpdate({ _id }, { $set: user }, { new: true })
         .then(updtedUser => updtedUser
             ? res.status(200).json(updtedUser)
