@@ -9,28 +9,26 @@ import userRoutes from "./routes/user";
 
 import User from "./database/models/User";
 
-const passport = require("passport");
+import passport from "passport";
 const LocalStrategy = require("passport-local").Strategy;
-const sessions = require("client-sessions");
+import sessions from "client-sessions";
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ "extended": true }));
 
-app.use("/posts", postRoutes);
-app.use("/user", userRoutes);
-
-// TODO: Set secureProxy to true in production.
 app.use(sessions({
-  cookieName: 'session', // cookie name dictates the key name added to the request object
-  secret: config.sessions.secret, // should be a large unguessable string
-  duration: 24 * 60 * 60 * 1000, // how long the session will stay valid in ms
-  activeDuration: 1000 * 60 * 5, // if expiresIn < activeDuration, the session will be extended by activeDuration milliseconds
+    cookieName: "session", // cookie name dictates the key name added to the request object
+    secret: config.sessions.secret, // should be a large unguessable string
+    duration: 24 * 60 * 60 * 1000, // how long the session will stay valid in ms
+    activeDuration: 1000 * 60 * 5, // if expiresIn < activeDuration, the session will be extended by activeDuration milliseconds
     cookie: {
+        httpOnly: true, // Cookie is not accessible from javascript
+        // @ts-expect-error
         ephemeral: true, // Exit session when browser closes
-        // secureProxy: true // Only allow through SSL
-  }
+        secure: config.production // Only allow through SSL
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -40,16 +38,19 @@ passport.serializeUser((user: any, done: any) => {
     done(null, user.id);
 });
 
-passport.deserializeUser(function (id: any, done: any) {
-    User.findById(id, function (err: any, user: any) {
+passport.deserializeUser((id: any, done: any) => {
+    User.findById(id, (err: any, user: any) => {
         done(err, user);
     });
 });
 
+app.use("/posts", postRoutes);
+app.use("/user", userRoutes);
+
 // Configure the passport LocalStrategy
 passport.use(new LocalStrategy(
-    function (username: string, password: string, done: any) {
-        User.findOne({ $or: [{ email: username }, { username }] }, function (err: any, user: any) {
+    (username: string, password: string, done: any) => {
+        User.findOne({ $or: [{ email: username }, { username }] }, (err: any, user: any) => {
             if (err) { return done(err); }
             if (!user) {
                 return done(null, false, { message: 'Either the username or the passport is incorrect.' });

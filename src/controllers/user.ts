@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Types } from "mongoose";
 import User from "../database/models/User";
 import bcrypt from "bcryptjs";
-const passport = require("passport");
+import passport from "passport";
 
 import { userExists } from '../middleware/auth';
 
@@ -31,11 +31,16 @@ export const signup = async (req: Request, res: Response) => {
         });
 }
 
-export const login = passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/login"
-});
+export const login = async (req: Request, res: Response) => {
+    if(req.isAuthenticated()) res.status(200).json({ message: "login successful" });
+    else res.status(401).json({ message: "login un-successful" });
+}
 
+export const logout = async (req: Request, res: Response) => {
+    console.log(req.headers);
+    req.logOut();
+    res.status(200).json({ message: "logout successful" });
+}
 
 // create new user and return user data
 export const googleSignup = async (req: Request, res: Response) => {
