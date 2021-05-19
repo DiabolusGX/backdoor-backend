@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 
 import postRoutes from "./routes/posts";
 import userRoutes from "./routes/user";
+import threadRoutes from "./routes/threads";
 
 import User from "./database/models/User";
 
@@ -46,6 +47,7 @@ passport.deserializeUser((id: any, done: any) => {
 
 app.use("/posts", postRoutes);
 app.use("/user", userRoutes);
+app.use("/threads", threadRoutes);
 
 // Configure the passport LocalStrategy
 passport.use(new LocalStrategy(

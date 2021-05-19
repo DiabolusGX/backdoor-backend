@@ -1,13 +1,25 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
-import IPost from "../database/interfaces/postInterface";
-import IUser from "../database/interfaces/userInterface";
-import Post from "../database/models/postModel";
+import IUser from "../database/interfaces/IUser";
+import Post from "../database/models/Post";
+import User from "../database/models/User";
+import Thread from "../database/models/Thread";
 
 // get all posts
-export const getPost = async (req: Request, res: Response) => {
+export const getAllPosts = async (req: Request, res: Response) => {
     await Post
         .find()
+        .then(posts => res.status(200).json(posts))
+        .catch(err => res.status(404).json({ message: err.message }));
+}
+
+// get post by id
+export const getPost = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
+
+    await Post
+        .findOne({ _id: id })
         .then(posts => res.status(200).json(posts))
         .catch(err => res.status(404).json({ message: err.message }));
 }
@@ -16,9 +28,18 @@ export const getPost = async (req: Request, res: Response) => {
 export const createPost = async (req: Request, res: Response) => {
     const post = req.body;
 
-    await new Post(post)
+    await new Post({ ...post, user: (req.user as IUser)?._id })
         .save()
-        .then(newPost => res.status(201).json(newPost))
+        .then(async newPost => {
+            await User.updateOne({ _id: (req.user as IUser)?._id }, { $push: { posts: newPost._id } });
+            newPost.tags.forEach(async tag => {
+                await Thread.updateOne({ title: tag }, {
+                    $push: { posts: newPost._id },
+                    $inc: { 'numberOfPosts': 1 }
+                });
+            });
+            res.status(201).json(newPost);
+        })
         .catch(err => res.status(409).json({ message: err.message }));
 }
 
@@ -35,8 +56,7 @@ export const likePost = async (req: Request, res: Response) => {
             // @ts-expect-error
             if(post?.votes.includes(userId)) {
                 votes = post?.votes.filter((voter) => voter.toString() != user._id.toString());
-            }
-            else {
+            } else {
                 votes = post?.votes;
                 votes.push(user._id);
             }
@@ -69,8 +89,19 @@ export const deletePost = async (req: Request, res: Response) => {
     if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
 
     await Post
-        .findOneAndDelete({ _id: id })
-        .then(deletedPost =>  res.status(200).json(deletedPost))
+        //.findOneAndDelete({ _id: id })
+        .findOne({ _id: id })
+        .then(async deletedPost =>  {
+            await User.updateOne({ _id: (req.user as IUser)._id }, {
+                $pull: { posts: deletedPost?._id }
+            });
+            deletedPost?.tags.forEach(async tag => {
+                await Thread.updateOne({ title: tag }, {
+                    $pull: { posts: deletedPost?._id }
+                });
+            });
+            res.status(200).json({ message: "Post deleted successfully" });
+        })
         .catch(err => res.status(409).json({ message: err.message }));
 }
 

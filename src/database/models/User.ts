@@ -1,5 +1,5 @@
 import { Schema, model, Types } from "mongoose";
-import IUser from "../interfaces/userInterface";
+import IUser from "../interfaces/IUser";
 
 const UserSchema: Schema = new Schema({
     permission_level: { type: Number, required: true, default: 0 },

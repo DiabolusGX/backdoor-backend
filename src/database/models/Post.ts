@@ -1,5 +1,5 @@
 import { Schema, model, Types } from "mongoose";
-import IPost from "../interfaces/postInterface";
+import IPost from "../interfaces/IPost";
 
 const PostSchema: Schema = new Schema({
     title: { type: String, required: true },

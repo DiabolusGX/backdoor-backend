@@ -4,6 +4,7 @@ import User from "../database/models/User";
 import bcrypt from "bcryptjs";
 
 import { userExists } from '../middleware/auth';
+import IUser from "../database/interfaces/IUser";
 
 export const signup = async (req: Request, res: Response) => {
     const { email, username, password } = req.body;
@@ -19,19 +20,18 @@ export const signup = async (req: Request, res: Response) => {
         password: hash
     }
 
-    // TODO: Send a different response on success. One that doesn't have the hash.
     await new User(user)
         .save()
-        .then(newUser => {
-            res.status(200).json(newUser)
-        })
-        .catch(err => {
-            console.log(err);
-        });
+        .then(newUser => res.status(201).json({ message: "Registration Successful" }))
+        .catch(err => res.status(409).json({ message: err.message }));
 }
 
 export const login = async (req: Request, res: Response) => {
-    if(req.isAuthenticated()) res.status(200).json({ message: "Login Successful" });
+    if(req.isAuthenticated()) res.status(200).json({
+        message: "Login Successful",
+        username: (req.user as IUser).username,
+        permission_level: (req.user as IUser).permission_level
+    });
     else res.status(401).json({ message: "Login Unsuccessful" });
 }
 
@@ -68,13 +68,12 @@ export const googleLogin = async (req: Request, res: Response) => {
         .catch(err => res.status(409).json({ message: err.message }));
 }
 
-// get user data with document id
+// get user data with username
 export const getUser = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No user with id: ${id}` });
+    const username = req.params.username;
 
     await User
-        .findOne({ _id: id })
+        .findOne({ username })
         .then(user => user
             ? res.status(200).json(user)
             : res.status(404).json({ message: "No user found" }))

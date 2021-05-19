@@ -10,12 +10,12 @@ router.post("/signup", signup);
 router.post("/login", loginMiddleware, login);
 router.post("/logout", isLoggedIn, logout);
 
-// user paths
-router.get("/:id", getUser);
-router.patch("/update", isLoggedIn, updateUser);
-
 // google oauth paths
 router.post("/google/signup", googleSignup);
 router.post("/google/login", googleLogin);
+
+// user paths
+router.patch("/update", isLoggedIn, updateUser);
+router.get("/:username", getUser);
 
 export default router;
