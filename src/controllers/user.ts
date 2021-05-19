@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { Types } from "mongoose";
 import User from "../database/models/User";
 import bcrypt from "bcryptjs";
-import passport from "passport";
 
 import { userExists } from '../middleware/auth';
 
@@ -32,14 +31,13 @@ export const signup = async (req: Request, res: Response) => {
 }
 
 export const login = async (req: Request, res: Response) => {
-    if(req.isAuthenticated()) res.status(200).json({ message: "login successful" });
-    else res.status(401).json({ message: "login un-successful" });
+    if(req.isAuthenticated()) res.status(200).json({ message: "Login Successful" });
+    else res.status(401).json({ message: "Login Unsuccessful" });
 }
 
 export const logout = async (req: Request, res: Response) => {
-    console.log(req.headers);
     req.logOut();
-    res.status(200).json({ message: "logout successful" });
+    res.status(200).json({ message: "Logout Successful" });
 }
 
 // create new user and return user data
@@ -57,7 +55,7 @@ export const googleSignup = async (req: Request, res: Response) => {
     await new User(user)
         .save()
         .then(newUser => res.status(201).json(newUser))
-        .catch(err => res.status(409).json({ message: err.message, error: err }));
+        .catch(err => res.status(409).json({ message: err.message }));
 }
 
 // login user with given email id and return user data
@@ -67,19 +65,20 @@ export const googleLogin = async (req: Request, res: Response) => {
     await User
         .findOne({ email: email })
         .then(user => res.status(200).json(user))
-        .catch(err => res.status(409).json({ message: err.message, error: err }));
+        .catch(err => res.status(409).json({ message: err.message }));
 }
 
-// get user data with valied query like email, username or document id
+// get user data with document id
 export const getUser = async (req: Request, res: Response) => {
-    const query = req.query;
+    const id = req.params.id;
+    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No user with id: ${id}` });
 
     await User
-        .findOne(query)
+        .findOne({ _id: id })
         .then(user => user
             ? res.status(200).json(user)
-            : res.status(404).json({ message: "no user found" }))
-        .catch(err => res.status(404).json({ message: err.message, error: err }));
+            : res.status(404).json({ message: "No user found" }))
+        .catch(err => res.status(404).json({ message: err.message }));
 }
 
 // update user data using user document id and return new user data
@@ -91,6 +90,6 @@ export const updateUser = async (req: Request, res: Response) => {
         .findOneAndUpdate({ _id }, { $set: user }, { new: true })
         .then(updtedUser => updtedUser
             ? res.status(200).json(updtedUser)
-            : res.status(409).json({ message: "no updated user found" }))
-        .catch(err => res.status(409).json({ message: err.message, error: err }));
+            : res.status(409).json({ message: "No updated user" }))
+        .catch(err => res.status(409).json({ message: err.message }));
 }

@@ -5,13 +5,17 @@ import { isLoggedIn, loginMiddleware } from "../middleware/auth";
 
 const router = express.Router();
 
+// auth paths
 router.post("/signup", signup);
 router.post("/login", loginMiddleware, login);
-router.post("/logout", logout);
+router.post("/logout", isLoggedIn, logout);
 
+// user paths
+router.get("/:id", getUser);
+router.patch("/update", isLoggedIn, updateUser);
+
+// google oauth paths
 router.post("/google/signup", googleSignup);
 router.post("/google/login", googleLogin);
-router.get("/validate", getUser);
-router.patch("/update", updateUser);
 
 export default router;
