@@ -16,8 +16,7 @@ import sessions from "client-sessions";
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ "extended": true }));
+app.use(express.json());
 
 app.use(sessions({
     cookieName: "session", // cookie name dictates the key name added to the request object
@@ -26,7 +25,6 @@ app.use(sessions({
     activeDuration: 1000 * 60 * 5, // if expiresIn < activeDuration, the session will be extended by activeDuration milliseconds
     cookie: {
         httpOnly: true, // Cookie is not accessible from javascript
-        // @ts-expect-error
         ephemeral: true, // Exit session when browser closes
         secure: config.production // Only allow through SSL
     }
