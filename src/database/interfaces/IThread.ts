@@ -1,10 +1,10 @@
 import { Document, Types } from "mongoose";
 
 export default interface IThread extends Document {
-    title: String;
-    body: String;
+    title: string;
+    body: string;
     posts: [Types.ObjectId];
-    numberOfPosts: Number;
+    numberOfPosts: number;
     author: Types.ObjectId;
     createdAt: Date;
 }

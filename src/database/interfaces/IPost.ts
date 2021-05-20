@@ -1,12 +1,12 @@
 import { Document, Types } from "mongoose";
 
 export default interface IPost extends Document {
-    title: String;
-    body: String;
+    title: string;
+    body: string;
     author: Types.ObjectId;
     votes: [ Types.ObjectId ];
-    tags: [ String ];
-    comments: [{ author: Types.ObjectId, message: String, votes: Number, createdAt: Date }];
+    tags: [ string ];
+    comments: [{ author: Types.ObjectId, message: string, votes: number, createdAt: Date }];
     createdAt: Date;
     updatedAt: Date;
 }

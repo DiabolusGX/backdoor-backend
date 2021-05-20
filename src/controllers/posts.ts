@@ -45,13 +45,13 @@ export const createPost = async (req: Request, res: Response) => {
 
 // like post, get post by post document id and add user id to it's votes array
 export const likePost = async (req: Request, res: Response) => {
-    const postId = req.query.postId as string;
+    const id = req.query.id as string;
     const user = req.user as IUser;
-    if (!Types.ObjectId.isValid(postId)) return res.status(404).json({ message: `No post with id: ${postId}` });
+    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
 
     let votes:any = [];
     await Post
-        .findById(postId)
+        .findById(id)
         .then(async post => {
             // @ts-expect-error
             if(post?.votes.includes(userId)) {
@@ -64,7 +64,7 @@ export const likePost = async (req: Request, res: Response) => {
         .catch(err => res.status(409).json({ message: err.message }));
 
     await Post
-        .findOneAndUpdate({ _id: postId }, { $set: { votes: votes } }, { new: true })
+        .findOneAndUpdate({ _id: id }, { $set: { votes: votes } }, { new: true })
         .then(updatedPost => res.status(200).json(updatedPost))
         .catch(err => res.status(409).json({ message: err.message }));
 }
@@ -78,7 +78,8 @@ export const updatePost = async (req: Request, res: Response) => {
     if(post.user !== user._id) return res.status(401).json({ message: "This post is not made by logged in user." });
 
     await Post
-        .findOneAndUpdate({ _id }, { $set: post }, { new: true })
+        .findOneAndUpdate({ _id }, { $set: { ...post, updatedAt: Date.now } }, { new: true })
+        // TODO : remove post from old tags and add to new
         .then(updatedPost => res.status(200).json(updatedPost))
         .catch(err => res.status(409).json({ message: err.message }));
 }
@@ -89,15 +90,15 @@ export const deletePost = async (req: Request, res: Response) => {
     if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
 
     await Post
-        //.findOneAndDelete({ _id: id })
-        .findOne({ _id: id })
+        .findOneAndDelete({ _id: id })
         .then(async deletedPost =>  {
             await User.updateOne({ _id: (req.user as IUser)._id }, {
                 $pull: { posts: deletedPost?._id }
             });
             deletedPost?.tags.forEach(async tag => {
                 await Thread.updateOne({ title: tag }, {
-                    $pull: { posts: deletedPost?._id }
+                    $pull: { posts: deletedPost?._id },
+                    $inc: { 'numberOfPosts': -1 }
                 });
             });
             res.status(200).json({ message: "Post deleted successfully" });
@@ -107,15 +108,15 @@ export const deletePost = async (req: Request, res: Response) => {
 
 // search post using title or tags
 export const searchPost = async (req: Request, res: Response) => {
-    const searchQuery: string = req.query.searchQuery as string;
+    const title: string = req.query.title as string;
     const tags: string = req.query.tags as string || "";
-    const title = searchQuery ? new RegExp(searchQuery, "i") : "";
+    const titleRegexp = title ? new RegExp(title, "i") : "";
 
     let dbQuery = {};
-    if(!searchQuery && !tags) dbQuery = {};
-    else if(!tags) dbQuery = { title };
-    else if(!searchQuery) dbQuery = { tags: {$in: tags.split(",")} };
-    else dbQuery = { $and:[ { title } , {tags: {$in: tags.split(",")}} ] };
+    if(!title && !tags) dbQuery = {};
+    else if(!tags) dbQuery = { title: titleRegexp };
+    else if(!title) dbQuery = { tags: {$in: tags.split(",")} };
+    else dbQuery = { $and:[ { title: titleRegexp } , {tags: {$in: tags.split(",")}} ] };
 
     await Post
         .find( dbQuery )
