@@ -1,6 +1,6 @@
 import express from "express";
 
-import { signup, login, logout, googleSignup, googleLogin, getUser, updateUser } from "../controllers/user";
+import { signup, login, logout, checkAuthenticated, googleSignup, googleLogin, getUser, updateUser } from "../controllers/user";
 import { isLoggedIn, loginMiddleware } from "../middleware/auth";
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", loginMiddleware, login);
 router.post("/logout", isLoggedIn, logout);
+router.post("/check", checkAuthenticated);
 
 // google oauth paths
 router.post("/google/signup", googleSignup);

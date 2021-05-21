@@ -41,6 +41,20 @@ export const logout = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Logout Successful" });
 }
 
+export const checkAuthenticated = async (req: Request, res: Response) => {
+    if (req.isAuthenticated()) {
+        res.status(200).json({
+            message: "User is authenticated",
+            username: (req.user as IUser).username,
+            permissionLevel: (req.user as IUser).permissionLevel
+        });
+    } else {
+        res.status(401).json({
+            message: "User is not authenticated",
+        })
+    }
+}
+
 // create new user and return user data
 export const googleSignup = async (req: Request, res: Response) => {
     const { username, bio, profile } = req.body;
