@@ -31,7 +31,7 @@ export const login = async (req: Request, res: Response) => {
         res.status(200).json({
             message: "Login Successful",
             username: (req.user as IUser).username,
-            permission_level: (req.user as IUser).permission_level
+            permissionLevel: (req.user as IUser).permissionLevel
         });
     }
 }

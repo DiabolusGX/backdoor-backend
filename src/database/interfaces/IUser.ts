@@ -1,7 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export default interface IUser extends Document {
-    permission_level: number;
+    permissionLevel: number;
     email: string;
     verified: Boolean;
     username: string;
