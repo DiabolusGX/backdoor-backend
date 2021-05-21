@@ -72,25 +72,34 @@ export const googleLogin = async (req: Request, res: Response) => {
 // get user data with username
 export const getUser = async (req: Request, res: Response) => {
     const username = req.params.username;
+    const id = (req.user as IUser)?._id;
 
     await User
         .findOne({ username })
-        .then(user => user
-            ? res.status(200).json(user)
-            : res.status(404).json({ message: "No user found" }))
+        .then(user => {
+            if (id != user?._id) return res.status(401).json({ message: `You're not authorized to access to do that.` });
+            const sendUser: any = user;
+            delete sendUser?.password;
+            return res.status(200).json(sendUser);
+        })
         .catch(err => res.status(404).json({ message: err.message }));
 }
 
 // update user data using user document id and return new user data
 export const updateUser = async (req: Request, res: Response) => {
-    const { user } = req.body;
+    const { newUserData } = req.body;
     const id = (req.user as IUser)?._id;
-    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No user with id: ${id}` });
 
-    await User
-        .findOneAndUpdate({ _id: id }, { $set: user }, { new: true })
-        .then(updtedUser => updtedUser
-            ? res.status(200).json(updtedUser)
-            : res.status(409).json({ message: "No updated user" }))
-        .catch(err => res.status(409).json({ message: err.message }));
+    await User.findById(id)
+        .then(async user => {
+            if (id != user?._id) return res.status(401).json({ message: `You're not authorized to access to do that.` });
+            await User
+                .updateOne({ _id: id }, { $set: newUserData }, { new: true })
+                .then(updatedUser => {
+                    const sendUser: any = updatedUser;
+                    delete sendUser?.password;
+                    res.status(200).json(updatedUser)
+                })
+        })
+        .catch(err => res.status(404).json({ message: err.message }));
 }
