@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import cors from 'cors';
 import config from "./configs/config";
 import bcrypt from 'bcryptjs';
 
@@ -17,6 +18,11 @@ import sessions from "client-sessions";
 const app = express();
 
 app.use(express.json());
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+}));
 
 app.use(sessions({
     cookieName: "session", // cookie name dictates the key name added to the request object

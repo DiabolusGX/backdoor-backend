@@ -27,12 +27,13 @@ export const signup = async (req: Request, res: Response) => {
 }
 
 export const login = async (req: Request, res: Response) => {
-    if(req.isAuthenticated()) res.status(200).json({
-        message: "Login Successful",
-        username: (req.user as IUser).username,
-        permission_level: (req.user as IUser).permission_level
-    });
-    else res.status(401).json({ message: "Login Unsuccessful" });
+    if (req.isAuthenticated()) {
+        res.status(200).json({
+            message: "Login Successful",
+            username: (req.user as IUser).username,
+            permission_level: (req.user as IUser).permission_level
+        });
+    }
 }
 
 export const logout = async (req: Request, res: Response) => {
