@@ -1,8 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
-import cors from 'cors';
+import cors from "cors";
+import bcrypt from "bcryptjs";
 import config from "./configs/config";
-import bcrypt from 'bcryptjs';
 
 import postRoutes from "./routes/posts";
 import userRoutes from "./routes/user";
@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: `http://${config.client.hostname}:${config.client.port}`,
     credentials: true
 }));
 
