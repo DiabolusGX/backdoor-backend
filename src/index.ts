@@ -9,6 +9,7 @@ import userRoutes from "./routes/user";
 import threadRoutes from "./routes/threads";
 
 import User from "./database/models/User";
+import IUser from "./database/interfaces/IUser";
 
 import passport from "passport";
 const LocalStrategy = require("passport-local").Strategy;
@@ -17,6 +18,7 @@ import sessions from "client-sessions";
 const app = express();
 
 app.use(express.json());
+
 app.use(cors({
     origin: "http://localhost:3000",
     credentials: true
@@ -37,16 +39,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Configure passport sessions
-passport.serializeUser((user: any, done: any) => {
-    done(null, user.id);
-});
+passport.serializeUser((user: any, done: any) => done(null, user.id));
 
 passport.deserializeUser((id: any, done: any) => {
-    User.findById(id, (err: any, user: any) => {
-        done(err, user);
-    });
+    User.findById(id, (err: any, user: IUser) => done(err, user));
 });
 
+// Routes
 app.use("/posts", postRoutes);
 app.use("/user", userRoutes);
 app.use("/threads", threadRoutes);
@@ -54,14 +53,12 @@ app.use("/threads", threadRoutes);
 // Configure the passport LocalStrategy
 passport.use(new LocalStrategy(
     (username: string, password: string, done: any) => {
-        User.findOne({ $or: [{ email: username }, { username }] }, (err: any, user: any) => {
-            if (err) { return done(err); }
-            if (!user) {
-                return done(null, false, { message: 'Either the username or the passport is incorrect.' });
-            }
-            if (!bcrypt.compareSync(password, user.password)) {
-                return done(null, false, { message: 'Either the username or the passport is incorrect.' });
-            }
+        User.findOne({ $or: [{ email: username }, { username }] }, (err: any, user: IUser) => {
+            if(err) return done(err);
+            if(!user) 
+                return done(null, false, { message: "Either the username or the passport is incorrect." });
+            if(!bcrypt.compareSync(password, user.password)) 
+                return done(null, false, { message: "Either the username or the passport is incorrect." });
             return done(null, user);
         });
     }

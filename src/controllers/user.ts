@@ -83,11 +83,12 @@ export const getUser = async (req: Request, res: Response) => {
 
 // update user data using user document id and return new user data
 export const updateUser = async (req: Request, res: Response) => {
-    const { _id, user } = req.body;
-    if (!Types.ObjectId.isValid(_id)) return res.status(404).json({ message: `No user with id: ${_id}` });
+    const { user } = req.body;
+    const id = (req.user as IUser)?._id;
+    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No user with id: ${id}` });
 
     await User
-        .findOneAndUpdate({ _id }, { $set: user }, { new: true })
+        .findOneAndUpdate({ _id: id }, { $set: user }, { new: true })
         .then(updtedUser => updtedUser
             ? res.status(200).json(updtedUser)
             : res.status(409).json({ message: "No updated user" }))
