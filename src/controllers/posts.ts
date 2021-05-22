@@ -40,7 +40,7 @@ export const createPost = async (req: Request, res: Response) => {
             newPost.tags.forEach(async tag => {
                 await Thread.updateOne({ title: tag }, {
                     $push: { posts: newPost._id },
-                    $inc: { 'numberOfPosts': 1 }
+                    $inc: { numberOfPosts: 1 }
                 });
             });
             res.status(201).json(newPost);
@@ -85,16 +85,26 @@ export const likePost = async (req: Request, res: Response) => {
 
 // update post using post document id and return new post data
 export const updatePost = async (req: Request, res: Response) => {
-    const { _id, post } = req.body;
+    const { id, updatedPost } = req.body;
     const user = req.user as IUser;
 
-    if (!Types.ObjectId.isValid(_id)) return res.status(404).json({ message: `No post with id: ${_id}` });
-    if (post.user !== user._id) return res.status(401).json({ message: "This post is not made by logged in user." });
+    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
+    if (updatedPost.user.toString() !== user._id.toString()) return res.status(401).json({ message: "This post is not made by logged in user." });
 
     await Post
-        .findOneAndUpdate({ _id }, { $set: { ...post, updatedAt: Date.now } }, { new: true })
-        // TODO : remove post from old tags and add to new
-        .then(updatedPost => res.status(200).json(updatedPost))
+        .findById(id)
+        .then(async currPost => {
+            await Post
+                .findOneAndUpdate({ _id: id }, { $set: { ...updatedPost, updatedAt: Date.now() } }, { new: true })
+                .then(async newPost => {
+                    // Remove post from removed tags and add to updated tags
+                    const addThread = newPost?.tags.filter(tag => !currPost?.tags.includes(tag));
+                    const removeThread = currPost?.tags.filter(tag => !newPost?.tags.includes(tag));
+                    addThread?.forEach(async tag =>  await Thread.updateOne({ title: tag }, { $push: { posts: newPost?._id }, $inc: { numberOfPosts: 1 } }));
+                    removeThread?.forEach(async tag =>  await Thread.updateOne({ title: tag }, { $pull: { posts: newPost?._id }, $inc: { numberOfPosts: -1 } }));
+                    res.status(200).json(newPost);
+                })
+        })
         .catch(err => {
             console.log(err);
             res.status(409).json({ message: "There was an error while updating the post." })
@@ -115,7 +125,7 @@ export const deletePost = async (req: Request, res: Response) => {
             deletedPost?.tags.forEach(async tag => {
                 await Thread.updateOne({ title: tag }, {
                     $pull: { posts: deletedPost?._id },
-                    $inc: { 'numberOfPosts': -1 }
+                    $inc: { numberOfPosts: -1 }
                 });
             });
             res.status(200).json({ message: "Post deleted successfully" });

@@ -90,7 +90,7 @@ export const getUser = async (req: Request, res: Response) => {
     await User
         .findOne({ username })
         .then(user => {
-            if (id != user?._id) return res.status(401).json({ message: `You're not authorized to access to do that.` });
+            if (id.toString() != user?._id.toString()) return res.status(401).json({ message: `You're not authorized to access to do that.` });
             const sendUser: any = user;
             delete sendUser?.password;
             return res.status(200).json(sendUser);
@@ -107,7 +107,7 @@ export const updateUser = async (req: Request, res: Response) => {
         .then(async user => {
             if (id != user?._id) return res.status(401).json({ message: `You're not authorized to access to do that.` });
             await User
-                .updateOne({ _id: id }, { $set: newUserData }, { new: true })
+                .findOneAndUpdate({ _id: id }, { $set: newUserData }, { new: true })
                 .then(updatedUser => {
                     const sendUser: any = updatedUser;
                     delete sendUser?.password;
