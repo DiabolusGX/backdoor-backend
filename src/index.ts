@@ -14,8 +14,11 @@ import IUser from "./database/interfaces/IUser";
 import passport from "passport";
 const LocalStrategy = require("passport-local").Strategy;
 import sessions from "client-sessions";
+import helmet from "helmet";
 
 const app = express();
+// Use helmetjs to improve security using HTTP headers
+app.use(helmet());
 
 app.use(express.json());
 
