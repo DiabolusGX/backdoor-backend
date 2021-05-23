@@ -14,8 +14,10 @@ import IUser from "./database/interfaces/IUser";
 import passport from "passport";
 const LocalStrategy = require("passport-local").Strategy;
 import sessions from "client-sessions";
+import helmet from "helmet";
 
 const app = express();
+app.use(helmet());
 
 app.use(express.json());
 
