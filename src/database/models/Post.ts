@@ -6,6 +6,7 @@ const PostSchema: Schema = new Schema({
     body: { type: String, required: true },
     user: { type: Types.ObjectId, required: true },
     votes: [ Types.ObjectId ],
+    downVotes: [ Types.ObjectId ],
     tags: [ String ],
     comments: [{ user: Types.ObjectId, message: String, votes: Number, createdAt: Date }],
     createdAt: { type: Date, default: Date.now },

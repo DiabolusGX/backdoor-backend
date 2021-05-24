@@ -51,22 +51,35 @@ export const createPost = async (req: Request, res: Response) => {
         });
 }
 
-// like post, get post by post document id and add user id to it's votes array
-export const likePost = async (req: Request, res: Response) => {
+// vote or downVote post by id
+export const react = async (req: Request, res: Response) => {
     const id = req.query.id as string;
+    const action = req.query.action as string;
     const user = req.user as IUser;
     if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
 
+    let downVotes: any = [];
     let votes: any = [];
     await Post
         .findById(id)
         .then(async post => {
-            // @ts-expect-error
-            if (post?.votes.includes(userId)) {
-                votes = post?.votes.filter((voter) => voter.toString() != user._id.toString());
-            } else {
-                votes = post?.votes;
-                votes.push(user._id);
+            downVotes = post?.downVotes;
+            votes = post?.votes;
+            switch (action) {
+                case "like":
+                    downVotes = downVotes.filter((voter: IUser) => voter.toString() != user._id.toString());
+                    if (post?.votes.includes(user.id)) votes = post?.votes.filter(voter => voter.toString() != user._id.toString());
+                    else votes.push(user._id);
+                    break;
+
+                case "dislike":
+                    votes = votes.filter((voter: IUser) => voter.toString() != user._id.toString());
+                    if (post?.downVotes.includes(user.id)) downVotes = post?.downVotes.filter(voter => voter.toString() != user._id.toString());
+                    else downVotes.push(user._id);
+                    break;
+
+                default:
+                    break;
             }
         })
         .catch(err => {
@@ -75,7 +88,7 @@ export const likePost = async (req: Request, res: Response) => {
         });
 
     await Post
-        .findOneAndUpdate({ _id: id }, { $set: { votes: votes } }, { new: true })
+        .findOneAndUpdate({ _id: id }, { $set: { downVotes, votes } }, { new: true })
         .then(updatedPost => res.status(200).json(updatedPost))
         .catch(err => {
             console.log(err);
