@@ -29,6 +29,7 @@ export const login = async (req: Request, res: Response) => {
     if (req.isAuthenticated()) {
         res.status(200).json({
             message: "Login Successful",
+            id: (req.user as IUser)._id,
             username: (req.user as IUser).username,
             permissionLevel: (req.user as IUser).permissionLevel
         });
@@ -44,6 +45,7 @@ export const checkAuthenticated = async (req: Request, res: Response) => {
     if (req.isAuthenticated()) {
         res.status(200).json({
             message: "User is authenticated",
+            id: (req.user as IUser)._id,
             username: (req.user as IUser).username,
             permissionLevel: (req.user as IUser).permissionLevel
         });
