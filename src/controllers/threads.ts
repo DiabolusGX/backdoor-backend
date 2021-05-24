@@ -16,11 +16,10 @@ export const getAllThreads = async (req: Request, res: Response) => {
 
 // get thread details
 export const getThread = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: "Thread not found." });
+    const title = req.params.title;
 
     await Thread
-        .findOne({ _id: id })
+        .findOne({ title })
         .then(thread => res.status(200).json(thread))
         .catch(err => {
             console.log(err);
