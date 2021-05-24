@@ -8,6 +8,6 @@ const router = express.Router();
 router.get("/", getAllThreads);
 router.post("/create", isLoggedIn, createThread);
 
-router.get("/:id", getThread);
+router.get("/:title", getThread);
 
 export default router;
