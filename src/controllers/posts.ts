@@ -32,13 +32,14 @@ export const getPost = async (req: Request, res: Response) => {
 // create new post and return post data
 export const createPost = async (req: Request, res: Response) => {
     const post = req.body;
+    const formattedTags = post.tags.map((tag: string) => tag.toLowerCase());
 
-    await new Post({ ...post, user: (req.user as IUser)?._id })
+    await new Post({ ...post, tags: formattedTags, user: (req.user as IUser)?._id })
         .save()
         .then(async newPost => {
             await User.updateOne({ _id: (req.user as IUser)?._id }, { $push: { posts: newPost._id } });
             newPost.tags.forEach(async tag => {
-                await Thread.updateOne({ title: tag }, {
+                await Thread.updateOne({ title: tag.toLocaleLowerCase() }, {
                     $push: { posts: newPost._id },
                     $inc: { numberOfPosts: 1 }
                 });
@@ -52,7 +53,7 @@ export const createPost = async (req: Request, res: Response) => {
 }
 
 // vote or downVote post by id
-export const react = async (req: Request, res: Response) => {
+export const postReaction = async (req: Request, res: Response) => {
     const id = req.query.id as string;
     const action = req.query.action as string;
     const user = req.user as IUser;
@@ -68,13 +69,19 @@ export const react = async (req: Request, res: Response) => {
             switch (action) {
                 case "like":
                     downVotes = downVotes.filter((voter: IUser) => voter.toString() != user._id.toString());
-                    if (post?.votes.includes(user.id)) votes = post?.votes.filter(voter => voter.toString() != user._id.toString());
-                    else votes.push(user._id);
+                    if (post?.votes.includes(user._id)) {
+                        await User.findOneAndUpdate({ _id: user._id }, { $pull: { votedPosts: post._id } });
+                        votes = post?.votes.filter(voter => voter.toString() != user._id.toString());
+                    }
+                    else if (post) {
+                        await User.findOneAndUpdate({ _id: user._id }, { $push: { votedPosts: post._id } });
+                        votes.push(user._id);
+                    }
                     break;
 
                 case "dislike":
                     votes = votes.filter((voter: IUser) => voter.toString() != user._id.toString());
-                    if (post?.downVotes.includes(user.id)) downVotes = post?.downVotes.filter(voter => voter.toString() != user._id.toString());
+                    if (post?.downVotes.includes(user._id)) downVotes = post?.downVotes.filter(voter => voter.toString() != user._id.toString());
                     else downVotes.push(user._id);
                     break;
 
@@ -108,7 +115,7 @@ export const updatePost = async (req: Request, res: Response) => {
         .findById(id)
         .then(async currPost => {
             await Post
-                .findOneAndUpdate({ _id: id }, { $set: { ...updatedPost, updatedAt: Date.now() } }, { new: true })
+                .findOneAndUpdate({ _id: id }, { $set: { ...updatedPost, edited: true, updatedAt: Date.now() } }, { new: true })
                 .then(async newPost => {
                     // Remove post from removed tags and add to updated tags
                     const addThread = newPost?.tags.filter(tag => !currPost?.tags.includes(tag));
