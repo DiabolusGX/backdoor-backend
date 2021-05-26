@@ -30,7 +30,7 @@ export const createComment = async (req: Request, res: Response) => {
         .then(async newComment => {
             await Post.updateOne({ _id: postId }, { $push: { comments: newComment._id } });
             await User.updateOne({ _id: user._id }, { $push: { comments: newComment._id } });
-            res.status(201).json(newComment);
+            res.status(201).json({message: "Comment successfully added."});
         })
         .catch(err => {
             console.log(err);
