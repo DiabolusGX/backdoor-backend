@@ -35,7 +35,7 @@ export const createThread = async (req: Request, res: Response) => {
 
     await new Thread({ ...thread, user: (req.user as IUser)?._id })
         .save()
-        .then(thread => res.status(200).json(thread))
+        .then(thread => res.status(200).json({ message: "Thread created successfully" }))
         .catch(err => {
             console.log(err);
             res.status(404).json({ message: "There was an error while creating the thread." })

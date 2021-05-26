@@ -43,7 +43,7 @@ export const createPost = async (req: Request, res: Response) => {
                     $inc: { numberOfPosts: 1 }
                 });
             });
-            res.status(201).json(newPost);
+            res.status(201).json({ message: "Post added successfully!" });
         })
         .catch(err => {
             console.log(err);
@@ -113,8 +113,8 @@ export const updatePost = async (req: Request, res: Response) => {
                     // Remove post from removed tags and add to updated tags
                     const addThread = newPost?.tags.filter(tag => !currPost?.tags.includes(tag));
                     const removeThread = currPost?.tags.filter(tag => !newPost?.tags.includes(tag));
-                    addThread?.forEach(async tag =>  await Thread.updateOne({ title: tag }, { $push: { posts: newPost?._id }, $inc: { numberOfPosts: 1 } }));
-                    removeThread?.forEach(async tag =>  await Thread.updateOne({ title: tag }, { $pull: { posts: newPost?._id }, $inc: { numberOfPosts: -1 } }));
+                    addThread?.forEach(async tag => await Thread.updateOne({ title: tag }, { $push: { posts: newPost?._id }, $inc: { numberOfPosts: 1 } }));
+                    removeThread?.forEach(async tag => await Thread.updateOne({ title: tag }, { $pull: { posts: newPost?._id }, $inc: { numberOfPosts: -1 } }));
                     res.status(200).json(newPost);
                 })
         })
