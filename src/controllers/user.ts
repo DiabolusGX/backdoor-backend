@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 
 import { userExists } from '../middleware/auth';
 import IUser from "../database/interfaces/IUser";
+import { Types } from "mongoose";
 
 export const signup = async (req: Request, res: Response) => {
     const { email, username, password } = req.body;
@@ -84,19 +85,30 @@ export const googleLogin = async (req: Request, res: Response) => {
         .catch(err => res.status(409).json({ message: err.message }));
 }
 
-// get user data with username
+// get user data with user id
 export const getUser = async (req: Request, res: Response) => {
-    const username = req.params.username;
+    const userId = req.params.userId;
     const id = (req.user as IUser)?._id;
+    if (userId.toString() != id.toString()) return res.status(401).json({ message: `You're not authorized to access this information.` });
 
     await User
-        .findOne({ username })
+        .findOne({ _id: userId })
         .then(user => {
-            if (id.toString() != user?._id.toString()) return res.status(401).json({ message: `You're not authorized to access to do that.` });
             const sendUser: any = user;
             delete sendUser?.password;
             return res.status(200).json(sendUser);
         })
+        .catch(err => res.status(404).json({ message: err.message }));
+}
+
+// get username with user id
+export const getUsername = async (req: Request, res: Response) => {
+    const userId = req.query.userId as string;
+    if (!Types.ObjectId.isValid(userId)) return res.status(404).json({ message: `No user found with id : ${userId}` });
+
+    await User
+        .findOne({ _id: userId })
+        .then(user => res.status(200).json({ username: user?.username }))
         .catch(err => res.status(404).json({ message: err.message }));
 }
 

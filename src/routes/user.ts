@@ -1,6 +1,6 @@
 import express from "express";
 
-import { signup, login, logout, checkAuthenticated, googleSignup, googleLogin, getUser, updateUser } from "../controllers/user";
+import { signup, login, logout, checkAuthenticated, googleSignup, googleLogin, getUser, getUsername, updateUser } from "../controllers/user";
 import { isLoggedIn, loginMiddleware } from "../middleware/auth";
 
 const router = express.Router();
@@ -17,6 +17,7 @@ router.post("/google/login", googleLogin);
 
 // user paths
 router.patch("/update", isLoggedIn, updateUser);
+router.get("/username", isLoggedIn, getUsername);
 router.get("/:username", isLoggedIn, getUser);
 
 export default router;
