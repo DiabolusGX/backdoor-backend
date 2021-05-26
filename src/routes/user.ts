@@ -17,7 +17,7 @@ router.post("/google/login", googleLogin);
 
 // user paths
 router.patch("/update", isLoggedIn, updateUser);
-router.get("/username", isLoggedIn, getUsername);
-router.get("/:username", isLoggedIn, getUser);
+router.get("/username", getUsername);
+router.get("/:username", getUser);
 
 export default router;

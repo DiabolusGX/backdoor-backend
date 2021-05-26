@@ -85,20 +85,30 @@ export const googleLogin = async (req: Request, res: Response) => {
         .catch(err => res.status(409).json({ message: err.message }));
 }
 
-// get user data with user id
+// get user data with username
 export const getUser = async (req: Request, res: Response) => {
-    const userId = req.params.userId;
-    const id = (req.user as IUser)?._id;
-    if (userId.toString() != id.toString()) return res.status(401).json({ message: `You're not authorized to access this information.` });
+    const username = req.params.username;
+    const userId = (req.user as IUser)?._id;
 
     await User
-        .findOne({ _id: userId })
+        .findOne({ username })
         .then(user => {
-            const sendUser: any = user;
-            delete sendUser?.password;
-            return res.status(200).json(sendUser);
+            if(userId?.toString() === user?._id.toString()) {
+                // @ts-expect-error
+                const { password, ...sendData }: any = user._doc;
+                return res.status(200).json(sendData);
+            }
+            else {
+                // @ts-expect-error
+                const { password, email_verified, email, permissionLevel, ...sendData }: any = user._doc;
+                console.log(sendData);
+                return res.status(200).json(sendData);
+            }
         })
-        .catch(err => res.status(404).json({ message: err.message }));
+        .catch(err => {
+            console.error(err);
+            res.status(404).json({ message: err.message });
+        });
 }
 
 // get username with user id
@@ -123,9 +133,9 @@ export const updateUser = async (req: Request, res: Response) => {
             await User
                 .findOneAndUpdate({ _id: id }, { $set: newUserData }, { new: true })
                 .then(updatedUser => {
-                    const sendUser: any = updatedUser;
-                    delete sendUser?.password;
-                    res.status(200).json(updatedUser)
+                    // @ts-expect-error
+                    const { password, ...sendData }: any = updatedUser._doc;
+                    res.status(200).json(sendData)
                 })
         })
         .catch(err => res.status(404).json({ message: err.message }));

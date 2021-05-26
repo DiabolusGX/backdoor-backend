@@ -156,17 +156,30 @@ export const deletePost = async (req: Request, res: Response) => {
         });
 }
 
-// search post using title or tags
+// search post using title or tags or user
 export const searchPost = async (req: Request, res: Response) => {
     const title: string = req.query.title as string;
+    const userId: string = req.query.userId as string;
     const tags: string = req.query.tags as string || "";
     const titleRegexp = title ? new RegExp(title, "i") : "";
 
     let dbQuery = {};
-    if (!title && !tags) dbQuery = {};
-    else if (!tags) dbQuery = { title: titleRegexp };
-    else if (!title) dbQuery = { tags: { $in: tags.split(",") } };
-    else dbQuery = { $and: [{ title: titleRegexp }, { tags: { $in: tags.split(",") } }] };
+    // no search query
+    if (!title && !tags && !userId) dbQuery = {};
+    // only title
+    else if (!tags && !userId) dbQuery = { title: titleRegexp };
+    // only tags
+    else if (!title && !userId) dbQuery = { tags: { $in: tags.split(",") } };
+    // only user id
+    else if (!tags && !title) dbQuery = { user: userId };
+    // title and tags
+    else if (!userId) dbQuery = { $and: [{ title: titleRegexp }, { tags: { $in: tags.split(",") } }] };
+    // title and user id
+    else if (!tags) dbQuery = { $and: [{ title: titleRegexp }, { user: userId }] };
+    // tags and user id
+    else if (!title) dbQuery = { $and: [{ tags: { $in: tags.split(",") } }, { user: userId }] };
+    // all 3 given
+    else dbQuery = { $and: [{ title: titleRegexp }, { tags: { $in: tags.split(",") } }, { user: userId }] };
 
     await Post
         .find(dbQuery)
@@ -174,7 +187,8 @@ export const searchPost = async (req: Request, res: Response) => {
             ? res.status(200).json(posts)
             : res.status(404).json({ message: "No updated post" }))
         .catch(err => {
-            console.log(err);
-            res.status(409).json({ message: "There was an error while fetching the post." })
+            console.error(err);
+            console.log("here is errr");
+            res.status(409).json({ message: "There was an error while fetching the post." });
         });
 }
