@@ -34,7 +34,7 @@ export const createThread = async (req: Request, res: Response) => {
     if ((req.user as IUser)?.permissionLevel < 3)
         return res.status(401).json({ message: "You do not have the permission to create a thread." });
 
-    await new Thread({ ...thread, title: thread.title.toLocaleLowerCase(), user: (req.user as IUser)?._id })
+    await new Thread({ ...thread, title: thread.title.toLocaleLowerCase().replace(/\s/g, '-') , user: (req.user as IUser)?._id })
         .save()
         .then(thread => res.status(200).json({ message: "Thread created successfully" }))
         .catch(err => {

@@ -7,7 +7,7 @@ const UserSchema: Schema = new Schema({
     verified: Boolean,
     username: { type: String, required: true, unique: true },
     password: {type: String, required: true},
-    bio: { type: String },
+    bio: { type: String, default: "Cybersecurity enthusiast." },
     score: { type: Number, default: 0 },
     joinedAt: { type: Date, default: Date.now },
     posts: [ Types.ObjectId ],
