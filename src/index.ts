@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import config from "./configs/config";
 
 import postRoutes from "./routes/posts";
+import commentRoutes from "./routes/comments";
 import userRoutes from "./routes/user";
 import threadRoutes from "./routes/threads";
 
@@ -49,6 +50,7 @@ passport.deserializeUser((id: any, done: any) => {
 
 // Routes
 app.use("/posts", postRoutes);
+app.use("/comments", commentRoutes);
 app.use("/user", userRoutes);
 app.use("/threads", threadRoutes);
 

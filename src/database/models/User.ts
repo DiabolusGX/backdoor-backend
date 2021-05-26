@@ -11,6 +11,7 @@ const UserSchema: Schema = new Schema({
     score: { type: Number, default: 0 },
     joinedAt: { type: Date, default: Date.now },
     posts: [ Types.ObjectId ],
+    comments: [ Types.ObjectId ],
     votedPosts: [ Types.ObjectId ],
     votedComments: [ Types.ObjectId ]
 });

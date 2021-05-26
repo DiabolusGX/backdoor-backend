@@ -10,6 +10,7 @@ export default interface IUser extends Document {
     score: number;
     joinedAt: Date;
     posts:  [ Types.ObjectId ];
+    comments: [ Types.ObjectId ];
     votedPosts: [ Types.ObjectId ];
     votedComments: [ Types.ObjectId ];
 }

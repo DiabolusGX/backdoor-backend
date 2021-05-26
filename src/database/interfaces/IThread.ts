@@ -5,6 +5,7 @@ export default interface IThread extends Document {
     body: string;
     posts: [Types.ObjectId];
     numberOfPosts: number;
-    author: Types.ObjectId;
+    user: Types.ObjectId;
     createdAt: Date;
+    updatedAt: Date;
 }
