@@ -135,16 +135,17 @@ export const updatePost = async (req: Request, res: Response) => {
 // delete post using post document id
 export const deletePost = async (req: Request, res: Response) => {
     const id = req.query.id as string;
+    const user = req.user as IUser;
     if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
 
     await Post
         .findOne({ _id: id })
         .then(async post => {
-            if(post?.user.toString() !== (req.user as IUser)._id.toString())
+            if(post?.user.toString() !== user._id.toString() && user.permissionLevel < 2)
                 return res.status(401).json({ message: "You can not delete this post." });
             await Post.findOneAndDelete({ _id: id })
             .then(async deletedPost => {
-                await User.updateOne({ _id: (req.user as IUser)._id }, {
+                await User.updateOne({ _id: user._id }, {
                     $pull: { posts: deletedPost?._id }
                 });
                 deletedPost?.tags.forEach(async tag => {
