@@ -4,6 +4,7 @@ import IUser from "../database/interfaces/IUser";
 import Post from "../database/models/Post";
 import User from "../database/models/User";
 import Thread from "../database/models/Thread";
+import Comment from "../database/models/Comment";
 
 // get all posts
 export const getAllPosts = async (req: Request, res: Response) => {
@@ -147,6 +148,9 @@ export const deletePost = async (req: Request, res: Response) => {
                     $pull: { posts: deletedPost?._id },
                     $inc: { numberOfPosts: -1 }
                 });
+            });
+            deletedPost?.comments.forEach(async commentId => {
+                await Comment.findOneAndDelete({ _id: commentId });
             });
             res.status(200).json({ message: "Post deleted successfully" });
         })
