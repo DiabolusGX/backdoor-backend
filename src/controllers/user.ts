@@ -93,7 +93,7 @@ export const getUser = async (req: Request, res: Response) => {
     await User
         .findOne({ username })
         .then(user => {
-            if(userId?.toString() === user?._id.toString()) {
+            if (userId?.toString() === user?._id.toString()) {
                 // @ts-expect-error
                 const { password, ...sendData }: any = user._doc;
                 return res.status(200).json(sendData);
@@ -119,7 +119,10 @@ export const getUsername = async (req: Request, res: Response) => {
     await User
         .findOne({ _id: userId })
         .then(user => res.status(200).json({ username: user?.username }))
-        .catch(err => res.status(404).json({ message: err.message }));
+        .catch(err => {
+            console.log(err);
+            res.status(404).json({ message: "Something went wrong." })
+        });
 }
 
 // update user data using user document id and return new user data
