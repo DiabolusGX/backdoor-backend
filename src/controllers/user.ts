@@ -100,8 +100,7 @@ export const getUser = async (req: Request, res: Response) => {
             }
             else {
                 // @ts-expect-error
-                const { password, email_verified, email, permissionLevel, ...sendData }: any = user._doc;
-                console.log(sendData);
+                const { password, email_verified, email, ...sendData }: any = user._doc;
                 return res.status(200).json(sendData);
             }
         })
@@ -131,7 +130,9 @@ export const updateUser = async (req: Request, res: Response) => {
         .then(async user => {
             if (id != user?._id) return res.status(401).json({ message: `You're not authorized to access to do that.` });
             await User
-                .findOneAndUpdate({ _id: id }, { $set: newUserData }, { new: true })
+                .findOneAndUpdate({ _id: id }, {
+                    $set: { ...newUserData, bio: newUserData.bio.substring(0, 150) }
+                }, { new: true })
                 .then(updatedUser => {
                     // @ts-expect-error
                     const { password, ...sendData }: any = updatedUser._doc;
