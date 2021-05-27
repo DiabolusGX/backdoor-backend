@@ -138,21 +138,26 @@ export const deletePost = async (req: Request, res: Response) => {
     if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
 
     await Post
-        .findOneAndDelete({ _id: id })
-        .then(async deletedPost => {
-            await User.updateOne({ _id: (req.user as IUser)._id }, {
-                $pull: { posts: deletedPost?._id }
-            });
-            deletedPost?.tags.forEach(async tag => {
-                await Thread.updateOne({ title: tag }, {
-                    $pull: { posts: deletedPost?._id },
-                    $inc: { numberOfPosts: -1 }
+        .findOne({ _id: id })
+        .then(async post => {
+            if(post?.user.toString() !== (req.user as IUser)._id.toString())
+                return res.status(401).json({ message: "You can not delete this post." });
+            await Post.findOneAndDelete({ _id: id })
+            .then(async deletedPost => {
+                await User.updateOne({ _id: (req.user as IUser)._id }, {
+                    $pull: { posts: deletedPost?._id }
                 });
-            });
-            deletedPost?.comments.forEach(async commentId => {
-                await Comment.findOneAndDelete({ _id: commentId });
-            });
-            res.status(200).json({ message: "Post deleted successfully" });
+                deletedPost?.tags.forEach(async tag => {
+                    await Thread.updateOne({ title: tag }, {
+                        $pull: { posts: deletedPost?._id },
+                        $inc: { numberOfPosts: -1 }
+                    });
+                });
+                deletedPost?.comments.forEach(async commentId => {
+                    await Comment.findOneAndDelete({ _id: commentId });
+                });
+                res.status(200).json({ message: "Post deleted successfully" });
+            })
         })
         .catch(err => {
             console.log(err);
