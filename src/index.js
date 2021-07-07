@@ -19,15 +19,7 @@ var helmet_1 = __importDefault(require("helmet"));
 var path_1 = __importDefault(require("path"));
 var app = express_1.default();
 app.use(helmet_1.default());
-app.use(express_1.default.json());
-// app.use(
-//     cors({
-//         origin: `http://${
-//             process.env.CLIENT_HOSTNAME || config.client.hostname
-//         }:${process.env.CLIENT_PORT || config.client.port}`,
-//         credentials: true,
-//     })
-// );
+app.use(helmet_1.default({ contentSecurityPolicy: false }));
 app.use(client_sessions_1.default({
     cookieName: "session",
     secret: process.env.CLIENT_SECRET || "",
@@ -36,7 +28,8 @@ app.use(client_sessions_1.default({
     cookie: {
         httpOnly: true,
         ephemeral: true,
-        secureProxy: true
+        secureProxy: true, // for heroku
+        // secure: true, // Only allow through SSL
     },
 }));
 app.use(passport_1.default.initialize());
