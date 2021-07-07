@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require('dotenv').config();
 var express_1 = __importDefault(require("express"));
 var mongoose_1 = __importDefault(require("mongoose"));
 var bcryptjs_1 = __importDefault(require("bcryptjs"));
@@ -18,7 +19,6 @@ var client_sessions_1 = __importDefault(require("client-sessions"));
 var helmet_1 = __importDefault(require("helmet"));
 var path_1 = __importDefault(require("path"));
 var app = express_1.default();
-app.use(helmet_1.default());
 app.use(helmet_1.default({ contentSecurityPolicy: false }));
 app.use(client_sessions_1.default({
     cookieName: "session",
@@ -45,9 +45,10 @@ app.use("/comments", comments_1.default);
 app.use("/user", user_1.default);
 app.use("/threads", threads_1.default);
 // Serve static files
-app.use(express_1.default.static(__dirname + "/../build"));
-app.get("*", function (request, response) {
-    response.sendFile(path_1.default.resolve(__dirname, "../build", "index.html"));
+app.use(express_1.default.static(path_1.default.join(__dirname, "/../build")));
+app.get("/", function (request, response) {
+    console.log(path_1.default.join(__dirname, "/", "../build", "index.html"));
+    response.sendFile(path_1.default.join(__dirname, "/", "../build", "index.html"));
 });
 // Configure the passport LocalStrategy
 passport_1.default.use(new LocalStrategy(function (username, password, done) {

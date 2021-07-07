@@ -1,6 +1,6 @@
+require('dotenv').config();
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
 import bcrypt from "bcryptjs";
 // import config from "./configs/config";
 
@@ -19,7 +19,6 @@ import helmet from "helmet";
 import path from "path";
 
 const app = express();
-app.use(helmet());
 
 app.use(helmet({ contentSecurityPolicy: false }));
 
@@ -54,9 +53,10 @@ app.use("/user", userRoutes);
 app.use("/threads", threadRoutes);
 
 // Serve static files
-app.use(express.static(__dirname + "/../build"));
-app.get("*", (request, response) => {
-    response.sendFile(path.resolve(__dirname, "../build", "index.html"));
+app.use(express.static(path.join(__dirname, "/../build")));
+app.get("/", (request, response) => {
+    console.log(path.join(__dirname, "/", "../build", "index.html"));
+    response.sendFile(path.join(__dirname, "/", "../build", "index.html"));
 });
 
 // Configure the passport LocalStrategy
