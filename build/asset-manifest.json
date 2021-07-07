@@ -1,0 +1,29 @@
+{
+  "files": {
+    "main.css": "/static/css/main.cc596658.chunk.css",
+    "main.js": "/static/js/main.eb6f97d0.chunk.js",
+    "main.js.map": "/static/js/main.eb6f97d0.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.40307940.js",
+    "runtime-main.js.map": "/static/js/runtime-main.40307940.js.map",
+    "static/js/2.fe4a20a1.chunk.js": "/static/js/2.fe4a20a1.chunk.js",
+    "static/js/2.fe4a20a1.chunk.js.map": "/static/js/2.fe4a20a1.chunk.js.map",
+    "static/js/3.b05161dd.chunk.js": "/static/js/3.b05161dd.chunk.js",
+    "static/js/3.b05161dd.chunk.js.map": "/static/js/3.b05161dd.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/main.cc596658.chunk.css.map": "/static/css/main.cc596658.chunk.css.map",
+    "static/js/2.fe4a20a1.chunk.js.LICENSE.txt": "/static/js/2.fe4a20a1.chunk.js.LICENSE.txt",
+    "static/media/index.scss": "/static/media/Doctor Glitch.dba195ec.otf",
+    "static/media/authentication-illustration.1f9133aa.svg": "/static/media/authentication-illustration.1f9133aa.svg",
+    "static/media/chat-illustration.2dfa110a.svg": "/static/media/chat-illustration.2dfa110a.svg",
+    "static/media/discussion-illustration.e45661d2.svg": "/static/media/discussion-illustration.e45661d2.svg",
+    "static/media/post-illustration.ab23041a.svg": "/static/media/post-illustration.ab23041a.svg",
+    "static/media/publish-post-illustration.3f77733d.svg": "/static/media/publish-post-illustration.3f77733d.svg",
+    "static/media/securelogin-illustration.d4696db7.svg": "/static/media/securelogin-illustration.d4696db7.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.40307940.js",
+    "static/js/2.fe4a20a1.chunk.js",
+    "static/css/main.cc596658.chunk.css",
+    "static/js/main.eb6f97d0.chunk.js"
+  ]
+}

@@ -16,6 +16,7 @@ import passport from "passport";
 const LocalStrategy = require("passport-local").Strategy;
 import sessions from "client-sessions";
 import helmet from "helmet";
+import path from "path";
 
 const app = express();
 app.use(helmet());
@@ -53,6 +54,12 @@ app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
 app.use("/user", userRoutes);
 app.use("/threads", threadRoutes);
+
+// Serve static files
+app.use(express.static(__dirname + "/../build"));
+app.get("*", (request, response) => {
+    response.sendFile(path.join(__dirname, "/", "../build/index.html"));
+});
 
 // Configure the passport LocalStrategy
 passport.use(new LocalStrategy(
