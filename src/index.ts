@@ -21,16 +21,7 @@ import path from "path";
 const app = express();
 app.use(helmet());
 
-app.use(express.json());
-
-// app.use(
-//     cors({
-//         origin: `http://${
-//             process.env.CLIENT_HOSTNAME || config.client.hostname
-//         }:${process.env.CLIENT_PORT || config.client.port}`,
-//         credentials: true,
-//     })
-// );
+app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(
     sessions({
