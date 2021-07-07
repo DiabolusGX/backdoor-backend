@@ -36,7 +36,7 @@ app.use(client_sessions_1.default({
     cookie: {
         httpOnly: true,
         ephemeral: true,
-        secure: true, // Only allow through SSL
+        secureProxy: true
     },
 }));
 app.use(passport_1.default.initialize());
