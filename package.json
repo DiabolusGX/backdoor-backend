@@ -4,8 +4,7 @@
   "description": "Backend for our cyper security forum - \"Backdoor\"",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev --respawn src/index.ts",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "start": "nodemon --exec ts-node src/index.ts",
     "build": "tsc"
   },
   "repository": {
@@ -45,6 +44,7 @@
     "express": "^4.17.1",
     "helmet": "^4.6.0",
     "mongoose": "^5.12.9",
+    "nodemon": "^2.0.9",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0"
   }
