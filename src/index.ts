@@ -31,8 +31,7 @@ app.use(
         cookie: {
             httpOnly: true, // Cookie is not accessible from javascript
             ephemeral: true, // Exit session when browser closes
-            secureProxy: true, // for heroku
-            // secure: true, // Only allow through SSL
+            secure: true, // Only allow through SSL
         },
     })
 );
