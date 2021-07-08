@@ -78,8 +78,7 @@ app.use("/thrd", threadRoutes);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "/../build")));
-app.get("/", (_request, response) => {
-    console.log(path.join(__dirname, "/", "../build", "index.html"));
+app.get("*", (_request, response) => {
     response.sendFile(path.join(__dirname, "/", "../build", "index.html"));
 });
 
