@@ -24,7 +24,7 @@
     "url": "https://github.com/backdoor-epics/backdoor-backend.git/issues"
   },
   "homepage": "https://github.com/qubit-epics/backdoor-backend#readme",
-  "devDependencies": {
+  "dependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/client-sessions": "^0.8.1",
     "@types/cors": "^2.8.10",
@@ -32,9 +32,7 @@
     "@types/mongoose": "^5.10.5",
     "@types/node": "^15.3.0",
     "@types/passport": "^1.0.6",
-    "@types/passport-local": "^1.0.33"
-  },
-  "dependencies": {
+    "@types/passport-local": "^1.0.33",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "client-sessions": "^0.8.0",
