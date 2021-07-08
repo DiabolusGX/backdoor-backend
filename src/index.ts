@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
@@ -15,11 +15,13 @@ import IUser from "./database/interfaces/IUser";
 import passport from "passport";
 const LocalStrategy = require("passport-local").Strategy;
 import sessions from "client-sessions";
+import bodyParser from "body-parser";
 import helmet from "helmet";
 import path from "path";
 
 const app = express();
 
+app.use(bodyParser());
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(
@@ -31,7 +33,8 @@ app.use(
         cookie: {
             httpOnly: true, // Cookie is not accessible from javascript
             ephemeral: true, // Exit session when browser closes
-            secure: true, // Only allow through SSL
+            secureProxy: true, // for heroku
+            // secure: true, // Only allow through SSL
         },
     })
 );
@@ -40,22 +43,8 @@ app.use(passport.session());
 
 // Configure passport sessions
 passport.serializeUser((user: any, done: any) => done(null, user.id));
-
 passport.deserializeUser((id: any, done: any) => {
     User.findById(id, (err: any, user: IUser) => done(err, user));
-});
-
-// Routes
-app.use("/posts", postRoutes);
-app.use("/comments", commentRoutes);
-app.use("/user", userRoutes);
-app.use("/threads", threadRoutes);
-
-// Serve static files
-app.use(express.static(path.join(__dirname, "/../build")));
-app.get("/", (request, response) => {
-    console.log(path.join(__dirname, "/", "../build", "index.html"));
-    response.sendFile(path.join(__dirname, "/", "../build", "index.html"));
 });
 
 // Configure the passport LocalStrategy
@@ -80,6 +69,19 @@ passport.use(
         );
     })
 );
+
+// Routes
+app.use("/posts", postRoutes);
+app.use("/comments", commentRoutes);
+app.use("/user", userRoutes);
+app.use("/threads", threadRoutes);
+
+// Serve static files
+app.use(express.static(path.join(__dirname, "/../build")));
+app.get("/", (_request, response) => {
+    console.log(path.join(__dirname, "/", "../build", "index.html"));
+    response.sendFile(path.join(__dirname, "/", "../build", "index.html"));
+});
 
 // start database connection and server
 const port = process.env.PORT || "4000";

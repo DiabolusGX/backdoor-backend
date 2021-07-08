@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import { Types } from "mongoose";
 import IUser from "../database/interfaces/IUser";
 import Post from "../database/models/Post";
 import Thread from "../database/models/Thread";
 
 // get all threads details
-export const getAllThreads = async (req: Request, res: Response) => {
-    await Thread
+export const getAllThreads = async (_req: Request, res: Response) => {
+    return Thread
         .find()
         .then(threads => res.status(200).json(threads))
         .catch(err => {
@@ -34,9 +33,9 @@ export const createThread = async (req: Request, res: Response) => {
     if ((req.user as IUser)?.permissionLevel < 3)
         return res.status(401).json({ message: "You do not have the permission to create a thread." });
 
-    await new Thread({ ...thread, title: thread.title.toLocaleLowerCase().replace(/\s/g, '-') , user: (req.user as IUser)?._id })
+    return new Thread({ ...thread, title: thread.title.toLocaleLowerCase().replace(/\s/g, '-') , user: (req.user as IUser)?._id })
         .save()
-        .then(thread => res.status(200).json({ message: "Thread created successfully" }))
+        .then(_thread => res.status(200).json({ message: "Thread created successfully" }))
         .catch(err => {
             console.log(err);
             res.status(404).json({ message: "There was an error while creating the thread." })
@@ -49,13 +48,13 @@ export const updateThread = async (req: Request, res: Response) => {
     if ((req.user as IUser)?.permissionLevel < 3)
         return res.status(401).json({ message: "You do not have the permission to create a thread." });
 
-    await Thread
+    return Thread
         .findOne({ title })
         .then(async currThread => {
             if (title.toLowerCase() !== threadData.title.toLowerCase())
                 currThread?.posts.forEach(async postId => {
-                    await Post.findOneAndUpdate({ _id: postId }, { $pull:{ tags: title } });
-                    await Post.findOneAndUpdate({ _id: postId }, { $push:{ tags: threadData.title.toLowerCase() } });
+                    Post.findOneAndUpdate({ _id: postId }, { $pull:{ tags: title } });
+                    Post.findOneAndUpdate({ _id: postId }, { $push:{ tags: threadData.title.toLowerCase() } });
                 });
             await Thread
                 .findOneAndUpdate({ title }, { $set: {

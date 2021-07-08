@@ -11,7 +11,7 @@ export const isLoggedIn = (req: Request, res: Response, next: any) => {
 export const loginMiddleware = passport.authenticate("local");
 
 export const userExists = async (username: string | undefined, email: string | undefined): Promise<boolean> => {
-    return await User.exists({ $or: [{ email }, { username }] })
+    return User.exists({ $or: [{ email }, { username }] })
         .catch(err => {
             console.error(err);
             return true;
