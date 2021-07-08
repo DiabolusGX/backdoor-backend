@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.86d5f805.chunk.css",
-    "main.js": "/static/js/main.f6e9dfba.chunk.js",
-    "main.js.map": "/static/js/main.f6e9dfba.chunk.js.map",
+    "main.css": "/static/css/main.8d7322cc.chunk.css",
+    "main.js": "/static/js/main.cfdb4739.chunk.js",
+    "main.js.map": "/static/js/main.cfdb4739.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.398c8e4c.js",
     "runtime-main.js.map": "/static/js/runtime-main.398c8e4c.js.map",
-    "static/js/2.7c82842a.chunk.js": "/static/js/2.7c82842a.chunk.js",
-    "static/js/2.7c82842a.chunk.js.map": "/static/js/2.7c82842a.chunk.js.map",
+    "static/js/2.e673fc5b.chunk.js": "/static/js/2.e673fc5b.chunk.js",
+    "static/js/2.e673fc5b.chunk.js.map": "/static/js/2.e673fc5b.chunk.js.map",
     "static/js/3.eac8440b.chunk.js": "/static/js/3.eac8440b.chunk.js",
     "static/js/3.eac8440b.chunk.js.map": "/static/js/3.eac8440b.chunk.js.map",
     "index.html": "/index.html",
-    "static/css/main.86d5f805.chunk.css.map": "/static/css/main.86d5f805.chunk.css.map",
-    "static/js/2.7c82842a.chunk.js.LICENSE.txt": "/static/js/2.7c82842a.chunk.js.LICENSE.txt",
+    "static/css/main.8d7322cc.chunk.css.map": "/static/css/main.8d7322cc.chunk.css.map",
+    "static/js/2.e673fc5b.chunk.js.LICENSE.txt": "/static/js/2.e673fc5b.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/static/media/Doctor Glitch.dba195ec.otf",
     "static/media/authentication-illustration.1f9133aa.svg": "/static/media/authentication-illustration.1f9133aa.svg",
     "static/media/chat-illustration.2dfa110a.svg": "/static/media/chat-illustration.2dfa110a.svg",
@@ -22,8 +22,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.398c8e4c.js",
-    "static/js/2.7c82842a.chunk.js",
-    "static/css/main.86d5f805.chunk.css",
-    "static/js/main.f6e9dfba.chunk.js"
+    "static/js/2.e673fc5b.chunk.js",
+    "static/css/main.8d7322cc.chunk.css",
+    "static/js/main.cfdb4739.chunk.js"
   ]
 }
