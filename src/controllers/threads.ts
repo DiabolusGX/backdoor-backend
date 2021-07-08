@@ -5,7 +5,7 @@ import Thread from "../database/models/Thread";
 
 // get all threads details
 export const getAllThreads = async (_req: Request, res: Response) => {
-    return Thread
+    await Thread
         .find()
         .then(threads => res.status(200).json(threads))
         .catch(err => {
@@ -33,7 +33,7 @@ export const createThread = async (req: Request, res: Response) => {
     if ((req.user as IUser)?.permissionLevel < 3)
         return res.status(401).json({ message: "You do not have the permission to create a thread." });
 
-    return new Thread({ ...thread, title: thread.title.toLocaleLowerCase().replace(/\s/g, '-') , user: (req.user as IUser)?._id })
+    await new Thread({ ...thread, title: thread.title.toLocaleLowerCase().replace(/\s/g, '-') , user: (req.user as IUser)?._id })
         .save()
         .then(_thread => res.status(200).json({ message: "Thread created successfully" }))
         .catch(err => {
@@ -48,13 +48,13 @@ export const updateThread = async (req: Request, res: Response) => {
     if ((req.user as IUser)?.permissionLevel < 3)
         return res.status(401).json({ message: "You do not have the permission to create a thread." });
 
-    return Thread
+    await Thread
         .findOne({ title })
         .then(async currThread => {
             if (title.toLowerCase() !== threadData.title.toLowerCase())
                 currThread?.posts.forEach(async postId => {
-                    Post.findOneAndUpdate({ _id: postId }, { $pull:{ tags: title } });
-                    Post.findOneAndUpdate({ _id: postId }, { $push:{ tags: threadData.title.toLowerCase() } });
+                    await Post.findOneAndUpdate({ _id: postId }, { $pull:{ tags: title } });
+                    await Post.findOneAndUpdate({ _id: postId }, { $push:{ tags: threadData.title.toLowerCase() } });
                 });
             await Thread
                 .findOneAndUpdate({ title }, { $set: {

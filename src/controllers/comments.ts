@@ -10,12 +10,12 @@ export const getComment = async (req: Request, res: Response) => {
     const id = req.params.id;
     if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No comment found with id : ${id}` });
 
-    return Comment
+    await Comment
         .findOne({ _id: id })
         .then(comment => res.status(200).json(comment))
         .catch(err => {
             console.error(err);
-            res.status(404).json({ message: "There was an error." })
+            return res.status(404).json({ message: "There was an error." })
         });
 }
 
@@ -26,11 +26,11 @@ export const createComment = async (req: Request, res: Response) => {
     const user = req.user as IUser;
     if (!Types.ObjectId.isValid(postId)) return res.status(404).json({ message: `No post found with id : ${postId}` });
 
-    return new Comment({ ...comment, post: postId, user: (req.user as IUser)?._id })
+    await new Comment({ ...comment, post: postId, user: (req.user as IUser)?._id })
         .save()
         .then(async newComment => {
-            Post.updateOne({ _id: postId }, { $push: { comments: newComment._id } });
-            User.updateOne({ _id: user._id }, { $push: { comments: newComment._id } });
+            await Post.updateOne({ _id: postId }, { $push: { comments: newComment._id } });
+            await User.updateOne({ _id: user._id }, { $push: { comments: newComment._id } });
             res.status(201).json({message: "Comment successfully added."});
         })
         .catch(err => {
@@ -58,11 +58,11 @@ export const commentReaction = async (req: Request, res: Response) => {
                 case "like":
                     downVotes = downVotes.filter((voter: IUser) => voter.toString() != userId.toString());
                     if (comment?.votes.includes(userId)) {
-                        User.findOneAndUpdate({ _id: userId }, { $pull: { votedComments: commentId } });
+                        await User.findOneAndUpdate({ _id: userId }, { $pull: { votedComments: commentId } });
                         votes = comment?.votes.filter(voter => voter.toString() != userId.toString());
                     }
                     else {
-                        User.findOneAndUpdate({ _id: userId }, { $push: { votedComments: commentId } });
+                        await User.findOneAndUpdate({ _id: userId }, { $push: { votedComments: commentId } });
                         votes.push(userId);
                     }
                     break;
@@ -79,15 +79,15 @@ export const commentReaction = async (req: Request, res: Response) => {
         })
         .catch(err => {
             console.log(err);
-            res.status(409).json({ message: "There was an error." })
+            return res.status(409).json({ message: "There was an error." })
         });
 
-    return Comment
+    await Comment
         .findOneAndUpdate({ _id: commentId }, { $set: { downVotes, votes } }, { new: true })
         .then(updatedComment => res.status(200).json(updatedComment))
         .catch(err => {
             console.log(err);
-            res.status(409).json({ message: "There was an error." })
+            return res.status(409).json({ message: "There was an error." })
         });
 }
 
@@ -99,12 +99,12 @@ export const updateComment = async (req: Request, res: Response) => {
     if (!Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No post with id: ${id}` });
     if (updatedComment.user.toString() !== user._id.toString()) return res.status(401).json({ message: "This post is not made by logged in user." });
 
-    return Comment
+    await Comment
         .findOneAndUpdate({ _id: id }, { $set: { ...updatedComment, edited: true, updatedAt: Date.now() } }, { new: true })
         .then(newComment => res.status(200).json(newComment))
         .catch(err => {
             console.log(err);
-            res.status(409).json({ message: "There was an error while updating the comment." })
+            return res.status(409).json({ message: "There was an error while updating the comment." })
         });
 }
 
@@ -116,16 +116,16 @@ export const deleteComment = async (req: Request, res: Response) => {
     if (!Types.ObjectId.isValid(postId)) return res.status(404).json({ message: `No post with id: ${postId}` });
     if (!Types.ObjectId.isValid(commentId)) return res.status(404).json({ message: `No comment with id: ${commentId}` });
 
-    return Comment
+    await Comment
         .findOneAndDelete({ _id: commentId })
         .then(async _deletedComment => {
-            Post.updateOne({ _id: postId }, { $pull: { comments: commentId } });
-            User.updateOne({ _id: user._id }, { $pull: { comments: commentId } });
-            res.status(200).json({ message: "Comment deleted successfully" });
+            await Post.updateOne({ _id: postId }, { $pull: { comments: commentId } });
+            await User.updateOne({ _id: user._id }, { $pull: { comments: commentId } });
+            return res.status(200).json({ message: "Comment deleted successfully" });
         })
         .catch(err => {
             console.log(err);
-            res.status(409).json({ message: "There was an error while deleting the comment." })
+            return res.status(409).json({ message: "There was an error while deleting the comment." })
         });
 }
 

@@ -20,7 +20,7 @@ export const signup = async (req: Request, res: Response) => {
         password: hash
     }
 
-    return new User(user)
+    await new User(user)
         .save()
         .then(_newUser => res.status(201).json({ message: "Registration Successful" }))
         .catch(err => res.status(409).json({ message: err.message }));
@@ -115,7 +115,7 @@ export const getUsername = async (req: Request, res: Response) => {
     const userId = req.query.userId as string;
     if (!Types.ObjectId.isValid(userId)) return res.status(404).json({ message: `No user found with id : ${userId}` });
 
-    return User
+    await User
         .findOne({ _id: userId })
         .then(user => res.status(200).json({ username: user?.username }))
         .catch(err => {
@@ -129,10 +129,10 @@ export const updateUser = async (req: Request, res: Response) => {
     const { newUserData } = req.body;
     const id = (req.user as IUser)?._id;
 
-    return User.findById(id)
+    await User.findById(id)
         .then(async user => {
             if (id != user?._id) return res.status(401).json({ message: `You're not authorized to access to do that.` });
-            return User
+            await User
                 .findOneAndUpdate({ _id: id }, {
                     $set: { ...newUserData, bio: newUserData.bio.substring(0, 150) }
                 }, { new: true })
