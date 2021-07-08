@@ -71,10 +71,10 @@ passport.use(
 );
 
 // Routes
-app.use("/posts", postRoutes);
-app.use("/comments", commentRoutes);
-app.use("/user", userRoutes);
-app.use("/threads", threadRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/threads", threadRoutes);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "/../build")));
